@@ -8,8 +8,15 @@ class MoviesController < ApplicationController
   
     def index
       @movies = Movie.all
+      @title_class = ""
+      @release_date_class = ""
       if not params.empty?
         @movies = @movies.order(params[:col])
+        if params[:col] == "title"
+          @title_class = "hilite p-3 mb-2 bg-warning"
+        elsif params[:col] == "release_date"
+          @release_date_class = "hilite p-3 mb-2 bg-warning"
+        end
       end
     end
   
