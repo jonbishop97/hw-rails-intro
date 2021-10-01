@@ -6,9 +6,9 @@
 <table class="table table-striped col-md-12" id="movies">
   <thead>
     <tr>
-      <th>Movie Title</th>
+      <a href=<%movies_path({:col => "title"})%> >Movie Title</a>
       <th>Rating</th>
-      <th>Release Date</th>
+      <a id="release_date_header">Release Date</a>
       <th>More Info</th>
     </tr>
   </thead>
