@@ -7,8 +7,10 @@ class MoviesController < ApplicationController
     end
   
     def index
-      Movies.order(params[:col])
       @movies = Movie.all
+      if not params.empty?
+        @movies = @movies.order(params[:col])
+      end
     end
   
     def new
