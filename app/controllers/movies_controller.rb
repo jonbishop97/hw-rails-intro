@@ -7,6 +7,7 @@ class MoviesController < ApplicationController
     end
   
     def index
+      @all_ratings = ['G','PG','PG-13','R']
       @movies = Movie.all
       @title_sorted = false
       @release_date_sorted = false
