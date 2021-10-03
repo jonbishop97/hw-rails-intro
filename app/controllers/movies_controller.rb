@@ -18,17 +18,6 @@ class MoviesController < ApplicationController
         @release_date_sorted = true
       end
       
-      if params.has_key?(:col)
-        select_these = [""]
-        params[:ratingselection].each do |key, value|
-          if value
-            select_these.append(key)
-          end
-        end
-        @movies = Movie.select_by_ratings(select_these)
-        @movies = @movies.order(params[:col])
-      end
-      
       @rating_selection = Hash.new
       if params.has_key?(:commit) and params[:commit] = "Refresh"
         if params.has_key?(:ratings)
@@ -43,10 +32,26 @@ class MoviesController < ApplicationController
           end
         end
       else
-        @movies = Movie.select_by_ratings([@all_ratings])
-        @all_ratings.each do |rating|
-          @rating_selection[rating] = true
+        if params.has_key?(:ratingselection)
+          selected = Array.new
+          params[:ratingselection].each do |key,value|
+            if value
+              selected.append(key)
+            end
+          end
+          @movies = Movie.select_by_ratings(selected)
+          @all_ratings.each do |rating|
+            @rating_selection[rating] = params[:ratingselection][rating]
+          end
+        else
+          @movies = Movie.select_by_ratings(@all_ratings)
+          @all_ratings.each do |rating|
+            @rating_selection[rating] = true
+          end
         end
+      end
+      if params.has_key?(:col)
+        @movies = @movies.order(params[:col])
       end
     end
   
