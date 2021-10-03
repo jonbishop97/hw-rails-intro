@@ -12,37 +12,35 @@ class MoviesController < ApplicationController
       @movies = Movie.all
       @title_sorted = false
       @release_date_sorted = false
-      if params[:col] == "title"
+      if params.has_key?(:col)
+        session[:col] = params[:col]
+      end
+      
+      if session[:col] == "title"
         @title_sorted = true
-      elsif params[:col] == "release_date"
+      elsif session[:col] == "release_date"
         @release_date_sorted = true
       end
       
       @rating_selection = Hash.new
       if params.has_key?(:commit) and params[:commit] = "Refresh"
         if params.has_key?(:ratings)
+          session.delete(:ratings)
+          session[:ratings] = params[:ratings]
           @movies = Movie.select_by_ratings(params[:ratings].keys)
           @all_ratings.each do |rating|
             @rating_selection[rating] = params[:ratings].has_key?(rating)
           end
         else
-          @movies = Movie.select_by_ratings([""])
+          @movies = Movie.select_by_ratings(session[:ratings].keys)
           @all_ratings.each do |rating|
-            @rating_selection[rating] = false
+            @rating_selection[rating] = session[:ratings].has_key?(rating)
           end
         end
       else
-        if params.has_key?(:ratingselection)
-          selected = Array.new
-          params[:ratingselection].each do |key,value|
-            if value
-              selected.append(key)
-            end
-          end
-          @movies = Movie.select_by_ratings(selected)
-          @all_ratings.each do |rating|
-            @rating_selection[rating] = params[:ratingselection][rating]
-          end
+        if session.has_key?(:ratings)
+          flash.keep
+          redirect_to :ratings => session[:ratings], :col => session[:col], :commit => "Refresh"
         else
           @movies = Movie.select_by_ratings(@all_ratings)
           @all_ratings.each do |rating|
@@ -50,8 +48,8 @@ class MoviesController < ApplicationController
           end
         end
       end
-      if params.has_key?(:col)
-        @movies = @movies.order(params[:col])
+      if session.has_key?(:col)
+        @movies = @movies.order(session[:col])
       end
     end
   
