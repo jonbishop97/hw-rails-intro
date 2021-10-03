@@ -6,7 +6,7 @@
   Include:
   <% @all_ratings.each do |rating| %>
     <%= rating %>
-    <%= check_box_tag("ratings[#{rating}]", @rating_selection[:rating], id:"ratings_#{rating}") %>
+    <%= check_box_tag("ratings[#{rating}]", "1", @rating_selection[rating], id:"ratings_#{rating}") %>
   <% end %>
   <%= submit_tag 'Refresh', id:"ratings_submit", :class => 'btn btn-primary' %>
 <% end %>
@@ -16,11 +16,11 @@
       <% if @title_sorted %>
         <th class="hilite p-3 mb-2 bg-warning"><%= link_to("Movie Title", movies_path({:col => "title"}), id:"title_header")%></th>
       <% else %>
-        <th><%= link_to("Movie Title", movies_path({:col => "title"}), id:"title_header")%></th>
+        <th><%= link_to("Movie Title", movies_path({:col => "title", :ratingselection => @rating_selection}), id:"title_header")%></th>
       <% end %>
       <th>Rating</th>
       <% if @release_date_sorted %>
-        <th class="hilite p-3 mb-2 bg-warning"><%= link_to("Release Date", movies_path({:col => "release_date"}), id:"release_date_header")%></th>
+        <th class="hilite p-3 mb-2 bg-warning"><%= link_to("Release Date", movies_path({:col => "release_date", :ratingselection => @rating_selection}), id:"release_date_header")%></th>
       <% else %>
         <th><%= link_to("Release Date", movies_path({:col => "release_date"}), id:"release_date_header")%></th>
       <% end %>

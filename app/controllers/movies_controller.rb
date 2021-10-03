@@ -7,31 +7,45 @@ class MoviesController < ApplicationController
     end
   
     def index
+      print params
       @all_ratings = Movie.ratings
+      @movies = Movie.all
+      @title_sorted = false
+      @release_date_sorted = false
+      if params[:col] == "title"
+        @title_sorted = true
+      elsif params[:col] == "release_date"
+        @release_date_sorted = true
+      end
+      
+      if params.has_key?(:col)
+        select_these = [""]
+        params[:ratingselection].each do |key, value|
+          if value
+            select_these.append(key)
+          end
+        end
+        @movies = Movie.select_by_ratings(select_these)
+        @movies = @movies.order(params[:col])
+      end
+      
       @rating_selection = Hash.new
-      if params.has_key?(:ratings)
-        @movies = Movie.select_by_ratings(params[:ratings].keys)
-        @all_ratings.each do |rating|
-          if params[:ratings].has_key?(:rating)
-            @rating_selection[:rating] = true
-          else
-            @rating_selection[:rating] = false
+      if params.has_key?(:commit) and params[:commit] = "Refresh"
+        if params.has_key?(:ratings)
+          @movies = Movie.select_by_ratings(params[:ratings].keys)
+          @all_ratings.each do |rating|
+            @rating_selection[rating] = params[:ratings].has_key?(rating)
+          end
+        else
+          @movies = Movie.select_by_ratings([""])
+          @all_ratings.each do |rating|
+            @rating_selection[rating] = false
           end
         end
       else
-        @movies = Movie.select_by_ratings(@all_ratings)
+        @movies = Movie.select_by_ratings([@all_ratings])
         @all_ratings.each do |rating|
-          @rating_selection[:rating] = true
-        end
-      end
-      @title_sorted = false
-      @release_date_sorted = false
-      if not params.empty?
-        @movies = @movies.order(params[:col])
-        if params[:col] == "title"
-          @title_sorted = true
-        elsif params[:col] == "release_date"
-          @release_date_sorted = true
+          @rating_selection[rating] = true
         end
       end
     end
