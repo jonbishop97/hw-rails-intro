@@ -7,4 +7,8 @@ class Movie < ActiveRecord::Base
         end
         return ratings_hash.keys.sort
     end
+    
+    def self.select_by_ratings(ratings)
+        where(rating: ratings)
+    end
 end

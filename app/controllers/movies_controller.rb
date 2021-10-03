@@ -8,7 +8,22 @@ class MoviesController < ApplicationController
   
     def index
       @all_ratings = Movie.ratings
-      @movies = Movie.all
+      @rating_selection = Hash.new
+      if params.has_key?(:ratings)
+        @movies = Movie.select_by_ratings(params[:ratings].keys)
+        @all_ratings.each do |rating|
+          if params[:ratings].has_key?(:rating)
+            @rating_selection[:rating] = true
+          else
+            @rating_selection[:rating] = false
+          end
+        end
+      else
+        @movies = Movie.select_by_ratings(@all_ratings)
+        @all_ratings.each do |rating|
+          @rating_selection[:rating] = true
+        end
+      end
       @title_sorted = false
       @release_date_sorted = false
       if not params.empty?
