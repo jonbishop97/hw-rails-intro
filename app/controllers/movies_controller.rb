@@ -7,16 +7,51 @@ class MoviesController < ApplicationController
     end
   
     def index
+      print params
+      @all_ratings = Movie.ratings
       @movies = Movie.all
       @title_sorted = false
       @release_date_sorted = false
-      if not params.empty?
-        @movies = @movies.order(params[:col])
-        if params[:col] == "title"
-          @title_sorted = true
-        elsif params[:col] == "release_date"
-          @release_date_sorted = true
+      if params[:col] == "title"
+        @title_sorted = true
+      elsif params[:col] == "release_date"
+        @release_date_sorted = true
+      end
+      
+      @rating_selection = Hash.new
+      if params.has_key?(:commit) and params[:commit] = "Refresh"
+        if params.has_key?(:ratings)
+          @movies = Movie.select_by_ratings(params[:ratings].keys)
+          @all_ratings.each do |rating|
+            @rating_selection[rating] = params[:ratings].has_key?(rating)
+          end
+        else
+          @movies = Movie.select_by_ratings([""])
+          @all_ratings.each do |rating|
+            @rating_selection[rating] = false
+          end
         end
+      else
+        if params.has_key?(:ratingselection)
+          selected = Array.new
+          params[:ratingselection].each do |key,value|
+            if value
+              selected.append(key)
+            end
+          end
+          @movies = Movie.select_by_ratings(selected)
+          @all_ratings.each do |rating|
+            @rating_selection[rating] = params[:ratingselection][rating]
+          end
+        else
+          @movies = Movie.select_by_ratings(@all_ratings)
+          @all_ratings.each do |rating|
+            @rating_selection[rating] = true
+          end
+        end
+      end
+      if params.has_key?(:col)
+        @movies = @movies.order(params[:col])
       end
     end
   
